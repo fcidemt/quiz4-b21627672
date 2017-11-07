@@ -20,10 +20,12 @@ for ids in dataDic:
 
 def funDataClean():
     total = 0
+    count = 0
     dataDic_copy = copy.deepcopy(dataDic)
     for j in sorted(dataDic):
         attribute_values = []
-        if "?" in dataDic[j]:
+        quant = dataDic[j].count("?")
+        if quant == 1:
             class_canser = dataDic[j][9]
             question_index = dataDic[j].index("?")
             for i in sorted(dataDic):
@@ -35,8 +37,25 @@ def funDataClean():
             AV = round(sum(attribute_values) / len(attribute_values))
             dataDic[j][question_index] = AV
             total += AV
+            count += 1
             dataDic_copy = copy.deepcopy(dataDic)
-    average = total / 21
+        elif quant > 1:
+            for ci in range(quant):
+                attribute_values = []
+                class_canser = dataDic[j][9]
+                question_index = dataDic[j].index("?")
+                for i in sorted(dataDic):
+                    if dataDic[i][9] != class_canser:
+                        dataDic_copy.pop(i)
+                for k in sorted(dataDic_copy):
+                    if type(dataDic_copy[k][question_index]) is int:
+                        attribute_values.append(dataDic_copy[k][question_index])
+                AV = round(sum(attribute_values) / len(attribute_values))
+                dataDic[j][question_index] = AV
+                total += AV
+                count += 1
+                dataDic_copy = copy.deepcopy(dataDic)
+    average = total / count
     print('The average of all missing values is  : ' + '{0:.4f}'.format(average))
 
 y = sys.argv[1].split(",")
@@ -101,5 +120,4 @@ def performStepWiseSearch():
 
 funDataClean()
 performStepWiseSearch()
-
 #end of 1.py file
